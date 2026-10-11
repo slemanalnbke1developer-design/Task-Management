@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tasks-3</title>
+    <link rel="stylesheet" href="./bootstrap.min.css" />
+    <link rel="stylesheet" href="./bootstrap-icons.min.css" />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+    </style>
+  </head>
+  <body class="bg-light" dir="rtl">
+    <div
+      class="container bg-secondary bg-opacity-25 border border-info rounded-4 mt-2 text-center"
+    >
+      <div class="row justify-content-center">
+        <div class="col-12 mt-3">
+          <h2>ادارة مهام</h2>
+        </div>
+        <div class="row mt-3">
+          <div class="col-1">
+            <button class="btn btn-danger" id="btnInput">أضف</button>
+          </div>
+
+          <div class="col-2">
+            <select class="form-control text-center" id="select">
+              <option value="عمل">عمل</option>
+              <option value="شخصي">شخصي</option>
+              <option value="تسوق">تسوق</option>
+            </select>
+          </div>
+
+          <div class="col-6">
+            <input
+              class="form-control text-center"
+              type="text"
+              placeholder="ادخل المهمة"
+              id="taskInput"
+            />
+          </div>
+        </div>
+        <div class="row mt-3">
+          <div class="col-12">
+            <table class="table table-bordered border-warning">
+              <thead class="table-warning border-warning">
+                <tr>
+                  <th>الرقم</th>
+                  <th>عمل</th>
+                  <th>شخصي</th>
+                  <th>تسوق</th>
+                  <th>وصف المهمة</th>
+                  <th>تنفيذ</th>
+                  <th>حذف</th>
+                </tr>
+              </thead>
+              <tbody id="tbody">
+                <tr>
+                  <td colspan="7" class="text-muted fw-bold py-3">
+                    لا توجد مهام لعرضها
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-auto"><label for="filter">عرض :</label></div>
+          <div class="col-2">
+            <select id="filter" class="form-control text-center">
+              <option value="كل الفئات">كل الفئات</option>
+              <option value="عمل">عمل</option>
+              <option value="شخصي">شخصي</option>
+              <option value="تسوق">تسوق</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let Tasks = [];
+      let numTask = 1;
+
+      const Select = document.getElementById("select");
+      const TaskInput = document.getElementById("taskInput");
+      const BtnInput = document.getElementById("btnInput");
+      const Filter = document.getElementById("filter");
+      const Tbody = document.getElementById("tbody");
+
+      BtnInput.addEventListener("click", () => {
+        const titleTask = TaskInput.value;
+        const category = Select.value;
+
+        if (titleTask === "") {
+          alert("يرجى ادخال مهمة");
+          return;
+        }
+
+        const task = {
+          id: Date.now(),
+          numTask: numTask++,
+          titleTask: titleTask,
+          category: category,
+          completed: false,
+        };
+
+        Tasks.push(task);
+        TaskInput.value = "";
+        render();
+      });
+
+      Filter.addEventListener("change", render);
+      function reorderNumbers() {
+        Tasks = Tasks.map((item, index) => {
+          return { ...item, numTask: index + 1 };
+        });
+      }
+
+      function render() {
+        Tbody.innerHTML = "";
+
+        let filteredTasks =
+          Filter.value === "كل الفئات"
+            ? Tasks
+            : Tasks.filter((t) => t.category === Filter.value);
+
+        if (filteredTasks.length === 0) {
+          Tbody.innerHTML = `<tr>
+            <td colspan="7" class="text-muted fw-bold py-3">لا توجد مهام لعرضها</td></tr>`;
+          return;
+        }
+
+        filteredTasks.forEach((item) => {
+          const tr = document.createElement("tr");
+
+          const btnClass = item.completed
+            ? "btn-success"
+            : "btn-outline-success";
+          const iconClass = item.completed ? "bi-check-all" : "bi-check-lg";
+          const textDecoration = item.completed
+            ? "text-decoration-line-through text-muted"
+            : "";
+
+          tr.innerHTML = `
+        <td>${item.numTask}</td>
+        <td>${item.category === "عمل" ? "✔" : ""}</td>
+        <td>${item.category === "شخصي" ? "✔" : ""}</td>
+        <td>${item.category === "تسوق" ? "✔" : ""}</td>
+        <td class="${textDecoration}">${item.titleTask}</td>
+
+        <td>
+         <button class="btn btn-sm ${btnClass}" onclick="toggleTasks(${item.id})">
+          <i class="bi ${iconClass}"></i>
+         </button>
+        </td>
+
+        <td>
+         <button class="btn btn-sm px-3" onclick="deleteTasks(${item.id})">
+          <i class="bi bi-trash text-danger fs-5"></i>
+         </button>
+        </td>
+      `;
+
+          Tbody.appendChild(tr);
+        });
+      }
+
+      function toggleTasks(id) {
+        Tasks = Tasks.map((item) => {
+          if (item.id === id) {
+            return { ...item, completed: !item.completed };
+          }
+          return item;
+        });
+        render();
+      }
+
+      function deleteTasks(id) {
+        Tasks = Tasks.filter((item) => item.id !== id);
+        reorderNumbers();
+        render();
+      }
+    </script>
+
+    <script src="./bootstrap.bundle.min.js"></script>
+  </body>
+</html>

@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Personal Organizer</title>
+    <link rel="stylesheet" href="./bootstrap.min.css" />
+    <link rel="stylesheet" href="./bootstrap-icons.min.css" />
+  </head>
+  <body class="bg-light" dir="rtl">
+    <div
+      class="container bg-secondary bg-opacity-25 border border-danger rounded-4 mt-2 text-center"
+    >
+      <div class="row mt-3 justify-content-around">
+        <div class="col">
+          <h2 class="text-center text-primary mt-2">Personal Organizer</h2>
+        </div>
+      </div>
+      <!-- task -->
+      <div class="row mt-3" id="tasks">
+        <div class="col-2">
+          <button class="btn btn-primary" id="btn-input-task">أضف</button>
+        </div>
+        <div class="col-10">
+          <input
+            type="text"
+            class="form-control text-center"
+            placeholder="المهمة"
+            id="input-task"
+          />
+        </div>
+      </div>
+      <div class="row" id="tasks-1">
+        <div class="col-12">
+          <table class="table table-bordered border-success text-center mt-4">
+            <thead class="table-success border-success">
+              <tr>
+                <th class="col-1" id="numTask">الرقم</th>
+                <th class="col-9" id="taskTitle">المهمة</th>
+                <th class="col-1" id="btnSuccess">التنفيذ</th>
+                <th class="col-1" id="btnDelete">حذف</th>
+              </tr>
+            </thead>
+            <tbody id="tbodytask">
+              <tr>
+                <td colspan="4" class="text-muted fw-bold py-3">
+                  لا توجد مهام لعرضها
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- notes -->
+      <div class="row mt-3" id="notse">
+        <div class="col-2">
+          <button class="btn btn-primary" id="btn-input-notse">أضف</button>
+        </div>
+        <div class="col-10">
+          <input
+            type="text"
+            class="form-control text-center"
+            placeholder="الملاحظة"
+            id="input-notse"
+          />
+        </div>
+      </div>
+      <div class="row" id="notse-1">
+        <div class="col-12">
+          <table class="table table-bordered border-success text-center mt-4">
+            <thead class="table-success border-success">
+              <tr>
+                <th class="col-1" id="numNotse">الرقم</th>
+                <th class="col-10" id="notseTitle">الملاحظة</th>
+                <th class="col-1" id="btnDeleteNotse">حذف</th>
+              </tr>
+            </thead>
+            <tbody id="tbodynotse">
+              <tr>
+                <td colspan="3" class="text-muted fw-bold py-3">
+                  لا توجد ملاحظات لعرضها
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- events -->
+      <div class="row mt-3" id="events">
+        <div class="col-2">
+          <button class="btn btn-primary" id="btn-input-event">أضف</button>
+        </div>
+        <div class="col-6">
+          <input
+            type="text"
+            class="form-control text-center"
+            placeholder="الحدث"
+            id="input-event"
+          />
+        </div>
+        <div class="col-4">
+          <input
+            type="date"
+            class="form-control text-center"
+            placeholder="التاريخ"
+            id="input-date"
+          />
+        </div>
+      </div>
+      <div class="row" id="events-1">
+        <div class="col-12">
+          <table class="table table-bordered border-success text-center mt-4">
+            <thead class="table-success border-success">
+              <tr>
+                <th class="col-1" id="numEvent">الرقم</th>
+                <th class="col-9" id="eventTitle">الحدث</th>
+                <th class="col-1" id="date">التاريخ</th>
+                <th class="col-1" id="btnDeleteEvent">حذف</th>
+              </tr>
+            </thead>
+            <tbody id="tbodyevent">
+              <tr>
+                <td colspan="4" class="text-muted fw-bold py-3">
+                  لا توجد أحداث لعرضها
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let tasks = [];
+      let notses = [];
+      let events = [];
+
+      const taskInput = document.getElementById("input-task");
+      const notseInput = document.getElementById("input-notse");
+      const eventsInput = document.getElementById("input-event");
+      const eventsInputDate = document.getElementById("input-date");
+
+      const btnInputTask = document.getElementById("btn-input-task");
+      const btnInputNotse = document.getElementById("btn-input-notse");
+      const btnInputEvent = document.getElementById("btn-input-event");
+
+      const tbodyTask = document.getElementById("tbodytask");
+      const tbodyNotse = document.getElementById("tbodynotse");
+      const tbodyEvent = document.getElementById("tbodyevent");
+
+      let taskCounter = 1;
+      let notseCounter = 1;
+      let eventCounter = 1;
+
+      btnInputTask.addEventListener("click", () => {
+        const TitleTask = taskInput.value.trim();
+        if (TitleTask === "") {
+          alert("!يرجى ادخال مهمة");
+          return;
+        }
+        const task = {
+          id: Date.now(),
+          numTask: taskCounter++,
+          taskTitle: TitleTask,
+          completed: false,
+        };
+        tasks.push(task);
+        taskInput.value = "";
+        renderTasks();
+      });
+
+      function renderTasks() {
+        tbodyTask.innerHTML = "";
+        if (tasks.length === 0) {
+          tbodyTask.innerHTML = `
+            <tr>
+              <td colspan="4" class="text-muted fw-bold py-3">لا توجد مهام لعرضها</td>
+            </tr>`;
+          return;
+        }
+
+        tasks.forEach((item) => {
+          const tr = document.createElement("tr");
+          const btnClass = item.completed
+            ? "btn-success"
+            : "btn-outline-success";
+          const iconClass = item.completed ? "bi-check-all" : "bi-check-lg";
+          const textDecoration = item.completed
+            ? "text-decoration-line-through text-muted"
+            : "";
+
+          tr.innerHTML = `
+            <td>${item.numTask}</td>
+            <td class="${textDecoration}">${item.taskTitle}</td>
+            <td>
+              <button class="btn btn-sm ${btnClass}" onclick="toggleTask(${item.id})">
+                <i class="bi ${iconClass}"></i>
+              </button>
+            </td>
+            <td>
+              <button class="btn btn-sm px-3" onclick="deleteTask(${item.id})">
+                <i class="bi bi-trash text-danger fs-5"></i>
+              </button>
+            </td>`;
+          tbodyTask.appendChild(tr);
+        });
+      }
+
+      function toggleTask(id) {
+        tasks = tasks.map((item) => {
+          if (item.id === id) {
+            return { ...item, completed: !item.completed };
+          }
+          return item;
+        });
+        renderTasks();
+      }
+
+      function deleteTask(id) {
+        tasks = tasks.filter((item) => item.id !== id);
+        renderTasks();
+      }
+
+      btnInputNotse.addEventListener("click", () => {
+        const TitleNotse = notseInput.value.trim();
+        if (TitleNotse === "") {
+          alert("!يرجى ادخال ملاحظة");
+          return;
+        }
+        const notse = {
+          id: Date.now(),
+          numNotse: notseCounter++,
+          notseTitle: TitleNotse,
+        };
+        notses.push(notse);
+        notseInput.value = "";
+        renderNotse();
+      });
+
+      function renderNotse() {
+        tbodyNotse.innerHTML = "";
+        if (notses.length === 0) {
+          tbodyNotse.innerHTML = `
+            <tr>
+              <td colspan="3" class="text-muted fw-bold py-3">لا توجد ملاحظات لعرضها</td>
+            </tr>`;
+          return;
+        }
+
+        notses.forEach((item) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${item.numNotse}</td>
+            <td>${item.notseTitle}</td>
+            <td>
+              <button class="btn btn-sm px-3" onclick="deleteNotse(${item.id})">
+                <i class="bi bi-trash text-danger fs-5"></i>
+              </button>
+            </td>`;
+          tbodyNotse.appendChild(tr);
+        });
+      }
+
+      function deleteNotse(id) {
+        notses = notses.filter((item) => item.id !== id);
+        renderNotse();
+      }
+
+      btnInputEvent.addEventListener("click", () => {
+        const TitleEvent = eventsInput.value.trim();
+        const eventDate = eventsInputDate.value;
+        if (TitleEvent === "" && eventDate === "") {
+          alert("!يرجى ادخال حدث وتاريخ صحيح");
+          return;
+        } else if (TitleEvent === "") {
+          alert("!يرجى ادخال حدث  ");
+          return;
+        } else if (eventDate === "") {
+          alert("!يرجى ادخال تاريخ صحيح");
+          return;
+        }
+        const event = {
+          id: Date.now(),
+          numEvent: eventCounter++,
+          eventTitle: TitleEvent,
+          date: eventDate,
+        };
+        events.push(event);
+        eventsInput.value = "";
+        eventsInputDate.value = "";
+        renderEvents();
+      });
+
+      function renderEvents() {
+        tbodyEvent.innerHTML = "";
+        if (events.length === 0) {
+          tbodyEvent.innerHTML = `
+            <tr>
+              <td colspan="4" class="text-muted fw-bold py-3">لا توجد أحداث لعرضها</td>
+            </tr>`;
+          return;
+        }
+
+        events.forEach((item) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${item.numEvent}</td>
+            <td>${item.eventTitle}</td>
+            <td>${item.date}</td>
+            <td>
+              <button class="btn btn-sm px-3" onclick="deleteEvent(${item.id})">
+                <i class="bi bi-trash text-danger fs-5"></i>
+              </button>
+            </td>`;
+          tbodyEvent.appendChild(tr);
+        });
+      }
+
+      function deleteEvent(id) {
+        events = events.filter((item) => item.id !== id);
+        renderEvents();
+      }
+    </script>
+    <script src="./bootstrap.bundle.min.js"></script>
+  </body>
+</html>
